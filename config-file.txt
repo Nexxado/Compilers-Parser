@@ -1,0 +1,6 @@
+terminals=ID,PLUS,MULT,LP,RP,$
+E=T;Ex,,,T;Ex,,
+Ex=,PLUS;T;Ex,,,eps,eps
+T=F;Tx,,,F;Tx,,
+Tx=,eps,TIMES;MULT;F;Tx,,eps,eps
+F=ID,,,LP;E;RP,,

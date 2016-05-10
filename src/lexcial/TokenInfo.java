@@ -1,3 +1,4 @@
+package lexcial;
 
 public class TokenInfo {
 	private TokenTypeEnum type;
