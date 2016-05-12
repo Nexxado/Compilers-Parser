@@ -1,0 +1,11 @@
+terminals=LC,RC,IF,LP,RP,ID,ASSIGN,PLUS,MINUS,SC,EOF
+#program:
+PRG=LC;STMTS;RC;EOF,,,,,,,,,,
+#statements
+STMTS=,eps,STMT;STMTS,,,STMT;STMTS,,,,,
+#single statement
+STMT=,,IF;LP;EXPR;RP;STMT,,,ID;ASSIGN;EXPR;SC,,,,,
+#expression
+EXPR=,,,,,ID;ET,,,,,
+#expression's tail
+ET=,,,,eps,,,PLUS;ET,MINUS;ET,eps,

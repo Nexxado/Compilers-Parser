@@ -20,7 +20,7 @@ public class Scanner {
 		reserved.put("int", TokenTypeEnum.INT);
 		reserved.put("func", TokenTypeEnum.FUNC);
 		reserved.put("main", TokenTypeEnum.MAIN);
-		reserved.put("IF", TokenTypeEnum.IF);
+		reserved.put("if", TokenTypeEnum.IF);
 		reserved.put("then", TokenTypeEnum.THEN);
 		reserved.put("else", TokenTypeEnum.ELSE);
 		
@@ -29,7 +29,7 @@ public class Scanner {
 			c = charReader.getChar();
 			
 		} catch (IOException e) {
-			System.out.println("[ERROR] Couldn't read file: " + e.toString());
+			System.err.println("[ERROR] Couldn't read file: " + e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -194,7 +194,7 @@ public class Scanner {
 
 
 		} catch (IOException e) {
-			System.out.println("[ERROR] Couldn't read file: " + e.toString());
+			System.err.println("[ERROR] Couldn't read file: " + e.toString());
 			e.printStackTrace();
 		}
 
@@ -203,7 +203,7 @@ public class Scanner {
 		try {
 			c = charReader.getChar();
 		} catch (IOException e) {
-			System.out.println("[ERROR] Couldn't read file: " + e.toString());
+			System.err.println("[ERROR] Couldn't read file: " + e.toString());
 			e.printStackTrace();
 		}
 		return new TokenInfo(TokenTypeEnum.ERROR, "", line);

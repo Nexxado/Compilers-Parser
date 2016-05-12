@@ -1,0 +1,24 @@
+digraph G {
+PRG_0 -> LC_1
+PRG_0 -> STMTS_1
+PRG_0 -> RC_1
+PRG_0 -> EOF_1
+STMTS_1 -> STMT_2
+STMTS_1 -> STMTS_2
+STMT_2 -> IF_3
+STMT_2 -> LP_3
+STMT_2 -> EXPR_3
+STMT_2 -> RP_3
+STMT_2 -> STMT_3
+EXPR_3 -> ID_4
+EXPR_3 -> ET_4
+ET_4 -> eps_5
+STMT_3 -> ID_5
+STMT_3 -> ASSIGN_5
+STMT_3 -> EXPR_5
+STMT_3 -> SC_5
+EXPR_5 -> ID_7
+EXPR_5 -> ET_7
+ET_7 -> eps_9
+STMTS_7 -> eps_10
+}
