@@ -20,4 +20,8 @@ public class TokenInfo {
 	public TokenTypeEnum getType() {
 		return type;
 	}
+	
+	public String getAttribute() {
+		return attribute;
+	}
 }

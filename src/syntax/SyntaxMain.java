@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Stack;
 
@@ -40,9 +41,10 @@ public class SyntaxMain {
 		if(parse_table == null)
 			return;
 		
+		int graphNodeId = 0;
 		Stack<String> parse_stack = new Stack<String>();
 		parse_stack.push(END_OF_INPUT_ID);
-		parse_stack.push(non_terminals.get(0));
+		parse_stack.push(non_terminals.get(0) + "_" + graphNodeId++);
 		
 		System.out.println("non_terminals: " + non_terminals); //TODO DEBUG
 		System.out.println("parse table: " + parse_table); //TODO DEBUG
@@ -54,7 +56,6 @@ public class SyntaxMain {
 		FileWriter writer;
 		TokenInfo token;
 		
-		int graphNodeId = 0, idModifier = 1;
 		StringBuilder builder = new StringBuilder();
 		builder.append("digraph G {" + System.lineSeparator()); //System.lineSeparator() = get system-dependant new line char
 		
@@ -80,29 +81,38 @@ public class SyntaxMain {
 				}
 				
 				String check = parse_stack.pop();
+				String check_noid = check.substring(0, check.indexOf('_'));
 				System.out.println("check 1: " + check); //TODO DEBUG
 				
-				while(non_terminals.contains(check)) {
-					String[] tab = parse_table.get(check).get(terminals.get(terminals.indexOf(tokenTypeString))).split(";");
+				while(non_terminals.contains(check_noid)) {
+					String[] tab = parse_table.get(check_noid).get(terminals.get(terminals.indexOf(tokenTypeString))).split(";");
 					System.out.println("tab " + Arrays.toString(tab)); //TODO DEBUG
 					
+					ArrayList<GraphNode> parse_sub_tree = new ArrayList<GraphNode>();
+					
 					for(int i = tab.length - 1; i >= 0; i--) { //Insert tab into stack in reverse order
-						parse_stack.push(tab[i]);
+						parse_stack.push(tab[i] + "_" + graphNodeId);
+						parse_sub_tree.add(new GraphNode(check, tab[i] + "_" + graphNodeId++));
 					}
 					
-					for(int i = 0; i < tab.length; i++)
-						builder.append(new GraphNode(check, tab[i], graphNodeId, idModifier)  + System.lineSeparator());
+					Collections.reverse(parse_sub_tree);
+					for(int i = 0; i < parse_sub_tree.size(); i++) {
+						builder.append(parse_sub_tree.get(i) + System.lineSeparator());
+					}
 					
-					graphNodeId += idModifier;
+//					graphNodeId -= tab.length;
+//					for(int i = 0; i < tab.length; i++)
+//						builder.append(new GraphNode(check, tab[i] + "_" + graphNodeId++)  + System.lineSeparator());
+					
 					System.out.println("stack: " + parse_stack); //TODO DEBUG
 					System.out.println("******* \ngraph: " + builder.toString() + "********"); //TODO DEBUG
 					check = parse_stack.pop();
+					check_noid = check.substring(0, check.indexOf('_'));
 					
 					//If Epslion, discard it and continue
-					if(check.equals(EPSILON_ID)) {
-						graphNodeId -= 2;
-						idModifier++;
+					if(check_noid.equals(EPSILON_ID)) {
 						check = parse_stack.pop();
+						check_noid = check.substring(0, check.indexOf('_'));
 						continue;
 					}
 				}
@@ -112,11 +122,13 @@ public class SyntaxMain {
 				System.out.println("check 2: " + check); //TODO DEBUG
 				System.out.println("stack: " + parse_stack); //TODO DEBUG
 				
-				if(!check.equals(tokenTypeString)) {
+				if(!check_noid.equals(tokenTypeString)) {
 					writer.close();
 					throw new LL1Exception();
 				}
 				
+				if(token.getType() == TokenTypeEnum.ID)
+					builder.append(new GraphNode(check, token.getAttribute() + "_" + graphNodeId++)  + System.lineSeparator());
 
 			} while(token.getType() != TokenTypeEnum.EOF);
 			
