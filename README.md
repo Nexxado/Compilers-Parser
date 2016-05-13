@@ -8,7 +8,7 @@ Implementing a simple Compiler's LL(1) Parser using Java & according to exercise
 
 
 ### Usage
-1. Export project as runnable Jar file, for example "syntax_parser.jar", with main class: `SyntaxMain.java`
+1. Export project as runnable Jar file, for example `syntax_parser.jar`, with main class: `SyntaxMain.java`
 2. Run from CLI: `java -jar syntax_parser.jar config.ll1 input.txt`
     * Config file must be a valid LL(1) parse table with first row defining Terminals
 3. Output will be in file `input.ptree`
