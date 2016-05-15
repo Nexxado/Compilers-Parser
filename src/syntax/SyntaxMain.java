@@ -42,10 +42,11 @@ public class SyntaxMain {
 			return;
 		
 		//Initialize Stack
-		int graphNodeId = 0;
-		Stack<String> parse_stack = new Stack<String>();
-		parse_stack.push(END_OF_INPUT_ID);
-		parse_stack.push(non_terminals.get(0) + "_" + graphNodeId++);
+		int nodeId = 0;
+		TreeNode root = new TreeNode(non_terminals.get(0) + "_" + nodeId++);
+		Stack<TreeNode> parse_stack = new Stack<TreeNode>();
+		parse_stack.push(new TreeNode(END_OF_INPUT_ID));
+		parse_stack.push(root);
 		
 		System.out.println("non_terminals: " + non_terminals); //TODO DEBUG
 		System.out.println("parse table: " + parse_table); //TODO DEBUG
@@ -56,9 +57,7 @@ public class SyntaxMain {
 		File outputFile;
 		FileWriter writer;
 		TokenInfo token;
-		
-		StringBuilder builder = new StringBuilder();
-		builder.append("digraph G {" + System.lineSeparator()); //System.lineSeparator() = get system-dependent new line char
+
 		
 		try {
 			
@@ -79,8 +78,8 @@ public class SyntaxMain {
 				if(!terminals.contains(tokenTypeString))
 					throw new LL1Exception();
 				
-				String check = parse_stack.pop();
-				String check_noid = check.substring(0, check.indexOf('_'));
+				TreeNode check = parse_stack.pop();
+				String check_noid = check.getName().substring(0, check.getName().indexOf('_'));
 				System.out.println("check 1: " + check); //TODO DEBUG
 				
 				//While stack top is non_terminal
@@ -94,28 +93,23 @@ public class SyntaxMain {
 					String[] tab_tokens = tab.split(";");
 					System.out.println("tab " + Arrays.toString(tab_tokens)); //TODO DEBUG
 					
-					ArrayList<GraphNode> parse_sub_tree = new ArrayList<GraphNode>();
 					
-					//Insert Grammar rule to stack and graph (in reverse order)
+					//Insert Grammar rule to stack (in reverse order)
 					for(int i = tab_tokens.length - 1; i >= 0; i--) {
-						parse_stack.push(tab_tokens[i] + "_" + graphNodeId);
-						parse_sub_tree.add(new GraphNode(check, tab_tokens[i] + "_" + graphNodeId++));
+						TreeNode node = new TreeNode(tab_tokens[i] + "_" + nodeId++);
+						parse_stack.push(node);
+						check.addChild(node);
 					}
 					
-					Collections.reverse(parse_sub_tree);
-					for(int i = 0; i < parse_sub_tree.size(); i++) {
-						builder.append(parse_sub_tree.get(i) + System.lineSeparator());
-					}
 					
 					System.out.println("stack: " + parse_stack); //TODO DEBUG
-					System.out.println("******* \ngraph: " + builder.toString() + "********"); //TODO DEBUG
 					check = parse_stack.pop();
-					check_noid = check.substring(0, check.indexOf('_'));
+					check_noid = check.getName().substring(0, check.getName().indexOf('_'));
 					
 					//If Epsilon, discard it and continue
 					if(check_noid.equals(EPSILON_ID)) {
 						check = parse_stack.pop();
-						check_noid = check.substring(0, check.indexOf('_'));
+						check_noid = check.getName().substring(0, check.getName().indexOf('_'));
 						continue;
 					}
 				}
@@ -128,24 +122,23 @@ public class SyntaxMain {
 					throw new LL1Exception();
 				
 				// Insert ID attributes to graph
-				if(token.getType() == TokenTypeEnum.ID) 
-					builder.append(new GraphNode(check, token.getAttribute() + "_" + graphNodeId++)  + System.lineSeparator());
+				if(token.getType() == TokenTypeEnum.ID)
+					check.addChild(new TreeNode(token.getAttribute() + "_" + nodeId++));
 
 			} while(token.getType() != TokenTypeEnum.EOF);
 			
 			
 			//FIXME depend on EOF token or on "$"?
-			if(parse_stack.empty() || !parse_stack.peek().equals(END_OF_INPUT_ID))
+			if(parse_stack.empty() || !parse_stack.peek().getName().equals(END_OF_INPUT_ID))
 				throw new LL1Exception();
 
-			builder.append("}");
 			
 			//Write graph string to output file
 			outputFilename = inputFilename.substring(0, inputFilename.lastIndexOf('.')) + ".ptree";
 			outputFile = new File(outputFilename);
 			
 			writer = new FileWriter(outputFile);
-			writer.write(builder.toString());
+			writer.write(generateGraph(root));
 			writer.close();
 			
 			
@@ -161,9 +154,35 @@ public class SyntaxMain {
 		
 		
 	}
+	
+	/**
+	 * @param root : TreeNode representing the Parse Tree's root node
+	 * @return A String representing the parse tree as a graph, according to http://www.webgraphviz.com/
+	 */
+	private static String generateGraph(TreeNode root) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("digraph G {" + System.lineSeparator());
+		generateTree(root, builder);
+		
+		builder.append("}");
+		return builder.toString();
+	}
 
 	
-	
+	private static void generateTree(TreeNode node, StringBuilder builder) {
+		if(node == null)
+			return;
+			
+//		System.err.println(node);
+		for(int i = node.getChildren().size() - 1; i >= 0; i--) {
+			String childName = node.getChildren().get(i).getName();
+			builder.append(new GraphNode(node.getName(), childName) + System.lineSeparator());
+		}
+			
+		for(int i = 0; i < node.getChildren().size(); i++) {
+			generateTree(node.getChildren().get(i), builder);
+		}
+	}
 	
 	/**
 	 * @param configFilename : Name of config file describing LL(1) table.
