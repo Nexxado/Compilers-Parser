@@ -15,23 +15,42 @@ import lexcial.TokenTypeEnum;
 
 public class Parser {
 	
-	private final String TERMINALS_ID = "terminals";
-	private final String EPSILON_ID = "eps";
-	private final String END_OF_INPUT_ID = "$";
-	private HashMap<String, HashMap<String, String>> parse_table;
-	private ArrayList<String> terminals;
-	private ArrayList<String> non_terminals = new ArrayList<String>();
-	private Stack<TreeNode> parse_stack = new Stack<TreeNode>();
+	/**
+	 * LL(1) Parser
+	 * Input: Config file representing LL1 Table & Input file.
+	 * Output: Grammar Tree root node.
+	 */
+	
+	//Filenames
 	private String input;
 	private String config;
 	
+	//Identifiers
+	private final String TERMINALS_ID = "terminals";
+	private final String EPSILON_ID = "eps";
+	private final String END_OF_INPUT_ID = "$";
 	
+	//Variables
+	private HashMap<String, HashMap<String, String>> parse_table; //holds LL1 table
+	private ArrayList<String> terminals; //holds Terminals from config file
+	private ArrayList<String> non_terminals; //holds non-Terminals from config file
+	private Stack<TreeNode> parse_stack; //Parsing Stack
+	
+	
+	//Constructor
 	public Parser(String configFilename, String inputFilename) {
 		config = configFilename;
 		input = inputFilename;
+		non_terminals = new ArrayList<String>();
+		parse_stack = new Stack<TreeNode>();
 	}
 	
 	
+	/**
+	 * Parse Config file into LL(1) Table
+	 * Read Input file and parse grammar tree 
+	 * @return Grammer Tree root node.
+	 */
 	public TreeNode yyLL1Parse() {
 		
 		
