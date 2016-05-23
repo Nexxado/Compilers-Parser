@@ -51,24 +51,20 @@ public class Parser {
 	 * Read Input file and parse grammar tree 
 	 * @return Grammer Tree root node.
 	 */
-	public TreeNode yyLL1Parse() {
+	public TreeNode yyLL1parse() {
 		
 		
 		parse_table = parseConfigFile(config);
 		if(parse_table == null)
 			return null;
 		
-		System.out.println("Parsing input..."); //TODO DEBUG
+//		System.out.println("Parsing input..."); //TODO DEBUG
 		
 		//Initialize Stack
 		int nodeId = 0;
 		TreeNode root = new TreeNode(non_terminals.get(0) + "_" + nodeId++);
 		parse_stack.push(new TreeNode(END_OF_INPUT_ID));
 		parse_stack.push(root);
-		
-//		System.out.println("non_terminals: " + non_terminals); //TODO DEBUG
-//		System.out.println("parse table: " + parse_table); //TODO DEBUG
-//		System.out.println("parse stack: " + parse_stack); //TODO DEBUG
 		
 		
 		Scanner sc;
@@ -84,7 +80,6 @@ public class Parser {
 				//Get next token
 				token = sc.yylex();
 				String tokenTypeString = token.getType().toString();
-//				System.out.println("token: " + token); //TODO DEBUG
 				
 				//Ignore whitespace and comments
 				if(token.getType() == TokenTypeEnum.WHITE || token.getType() == TokenTypeEnum.CMMNT) 
@@ -96,7 +91,6 @@ public class Parser {
 				
 				TreeNode check = parse_stack.pop();
 				String check_noid = check.getName().substring(0, check.getName().indexOf('_'));
-//				System.out.println("check 1: " + check); //TODO DEBUG
 				
 				//While stack top is non_terminal
 				while(non_terminals.contains(check_noid)) {
@@ -107,7 +101,6 @@ public class Parser {
 						throw new LL1Exception();
 					
 					String[] tab_tokens = tab.split(";");
-//					System.out.println("tab " + Arrays.toString(tab_tokens)); //TODO DEBUG
 					
 					
 					//Insert Grammar rule to stack (in reverse order)
@@ -118,7 +111,6 @@ public class Parser {
 					}
 					
 					
-//					System.out.println("stack: " + parse_stack); //TODO DEBUG
 					check = parse_stack.pop();
 					check_noid = check.getName().substring(0, check.getName().indexOf('_'));
 					
@@ -130,8 +122,6 @@ public class Parser {
 					}
 				}
 				
-//				System.out.println("check 2: " + check); //TODO DEBUG
-//				System.out.println("stack: " + parse_stack); //TODO DEBUG
 				
 				//Terminal from stack isn't equal to Terminal from input
 				if(!check_noid.equals(tokenTypeString))
@@ -144,16 +134,15 @@ public class Parser {
 			} while(token.getType() != TokenTypeEnum.EOF);
 			
 			
-			//FIXME depend on EOF token or on "$"?
 			if(parse_stack.empty() || !parse_stack.peek().getName().equals(END_OF_INPUT_ID))
 				throw new LL1Exception();
 
-			System.out.println("Done."); //TODO DEBUG
+//			System.out.println("Done."); //TODO DEBUG
 			return root;
 			
 			
 		} catch (FileNotFoundException e) {
-			System.err.println("[ERROR] Input File not Found: " + e.toString());
+			System.err.println("[ERROR] Input File not Found:\n" + e.toString());
 			return null;
 		} catch (LL1Exception e) {
 			System.err.println("input is wrong according to LL(1) table");
@@ -168,7 +157,7 @@ public class Parser {
 	 */
 	private HashMap<String, HashMap<String, String>> parseConfigFile(String configFilename) {
 		
-		System.out.println("Parsing Config File..."); //TODO DEBUG
+//		System.out.println("Parsing Config File..."); //TODO DEBUG
 		HashMap<String, HashMap<String, String>> table = new HashMap<String, HashMap<String,String>>();
 		BufferedReader reader;
 		String line;
@@ -187,7 +176,6 @@ public class Parser {
 			}
 			
 			terminals = new ArrayList<String>(Arrays.asList(line.substring(line.indexOf('=') + 1, line.length()).split(",")));
-//			System.out.println("terminals: " + terminals); //TODO DEBUG
 			
 			
 			while((line = reader.readLine()) != null) {
@@ -222,7 +210,7 @@ public class Parser {
 			return null;
 		}
 		
-		System.out.println("Successfuly Generated LL1 Table."); //TODO DEBUG
+//		System.out.println("Successfuly Generated LL1 Table."); //TODO DEBUG
 		return table;
 	}
 

@@ -20,7 +20,10 @@ public class SyntaxMain {
 		String inputFilename = args[1];
 		
 		Parser parser = new Parser(configFilename, inputFilename);
-		TreeNode root = parser.yyLL1Parse();
+		TreeNode root = parser.yyLL1parse();
+		
+		if(root == null)
+			return;
 		
 		try {
 
@@ -32,7 +35,7 @@ public class SyntaxMain {
 			FileWriter writer = new FileWriter(outputFile);
 			writer.write(generateGraph(root));
 			writer.close();
-			System.out.println("Graph data can be found in \"" + outputFile + "\", use webgraphviz.com to view."); //TODO DEBUG
+//			System.out.println("Graph data can be found in \"" + outputFile + "\", use webgraphviz.com to view."); //TODO DEBUG
 			
 			
 		} catch (FileNotFoundException e) {
