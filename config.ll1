@@ -8,4 +8,4 @@ STMT=,,IF;LP;EXPR;RP;STMT,,,ID;ASSIGN;EXPR;SC,,,,,
 #expression
 EXPR=,,,,,ID;ET,,,,,
 #expression's tail
-ET=,,,,eps,,,PLUS;ET,MINUS;ET,eps,
+ET=,,,,eps,,,PLUS;EXPR,MINUS;EXPR,eps,
